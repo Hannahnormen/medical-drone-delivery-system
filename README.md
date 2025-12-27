@@ -1,4 +1,8 @@
-# InfoCom Drone Project - Part 5 - Multi-drone System
+# Medical Drone Delivery System
+Course Project - Digitalization, System Design and User-Centered Development
+
+# Overview
+This project is based on a course-provided codebase used in earlier laboratory assignments. The initial framework included basic drone simulation, map visualization, and server communication.
 Install the required Python packages if not done already (you probably did this in the previous assignments):
 ```
 sudo apt update
