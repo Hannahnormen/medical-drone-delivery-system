@@ -1,0 +1,135 @@
+/* Allmän styling */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Rubriker */
+h1, h2 {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+h1 {
+    color:  #dbdbe5;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #333;
+    font-size: 2rem;
+}
+
+/* Header */
+header {
+    background: linear-gradient(to right, #1f1c67, #0b396a);
+    padding: 60px 20px;
+    text-align: center;
+    color: white;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #d1d9e6;
+}
+
+/* Huvudinnehåll */
+main {
+    display: block;  
+    visibility: visible !important;
+    padding: 40px 20px;
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: rgb(253, 250, 250) !important; /* För att se om det verkligen ändras */
+    min-height: 300px; /* Se till att den har höjd */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Spårningssektion */
+.track-order {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.track-order label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.track-order input {
+    width: 80%;
+    max-width: 400px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Knappar */
+.track-button {
+    width: 80%;
+    max-width: 400px;
+    padding: 15px;
+    background-color: #0b396a;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.track-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+.container {
+    width: 100%;
+    max-width: 600px; /* Justera bredden så att innehållet syns */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Footer */
+footer {
+    background-color: #1a3a5e;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Responsiv design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    header p {
+        font-size: 1rem;
+    }
+    .track-button {
+        font-size: 1.1rem;
+        padding: 12px 30px;
+    }
+}

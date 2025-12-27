@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang  = "svs">
+<head>
+  <title>QR Code Scanner</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+</head>
+<style>
+  .modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: auto;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.modal h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #171359;
+}
+
+.modal p {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.modal-button {
+  background-color: #1e1b63;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-button:hover {
+  background-color: #27692d;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+  body {
+    display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      font-family: 'Arial', sans-serif;
+
+  }
+
+  video {
+      border: 4px solid #333;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+
+  #output {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+  }
+
+  .success {
+    color: green;
+  }
+
+  .failure {
+    color: red;
+  }
+  </style>
+</head>
+
+<body>
+  <video id="video" width="640" height="480" autoplay></video>
+  <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Meddelande</h2>
+      <p id="modalMessage">Leveransen är genomförd!</p>
+      <button class="modal-button" onclick="window.location.href='/'">Till huvudsidan</button>
+    </div>
+  </div>
+
+  <p id="output">Scanning for QR code...</p>
+  <button onclick="window.location.href='/'">Tillbaka</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const output = document.getElementById('output');
+    const context = canvas.getContext('2d');
+    const modal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+
+    // Hämta order_id från URL:en
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
+
+    if (!orderId) {
+      output.textContent = "Order-ID saknas i URL.";
+      throw new Error("Ingen order-ID angiven");
+    }
+
+
+    function showModal(title, message) {
+      modalTitle.innerText = title;
+      modalMessage.innerText = message;
+      modal.style.display = 'flex';
+    }
+
+
+    function restartCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+          video.srcObject = stream;
+          video.play();
+          scanQRCode();
+        })
+        .catch(function(error) {
+          console.error('Error accessing the camera:', error);
+        });
+    }
+
+
+    // Access the camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+        scanQRCode();
+      })
+      .catch(function(error) {
+        console.error('Error accessing the camera:', error);
+        output.textContent = "Kunde inte öppna kameran.";
+      });
+
+    function scanQRCode() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (code && code.data != '') {
+        output.textContent = `QR Code Detected`;
+
+        //Stoppa kameran
+        const tracks = video.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+
+
+        output.textContent = `QR-kod hittad. Verifierar...`;
+
+        // Skicka till backend med order_id och kodens innehåll
+        fetch('/verify_qr', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            decoded_text: code.data,
+            order_id: orderId
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showModal('Leverans verifierad', 'Leveransen är genomförd!');
+          } else {
+            showModal('Fel', 'Ogiltig QR-kod, problem rapporterat.  Vi har registrerat problemet och återkommer inom kort för att hjälpa dig.');
+            output.textContent = "";
+          }
+        })
+        .catch(err => {
+          console.error('Verifieringsfel:', err);
+          showModal('Fel', 'Ett fel uppstod vid verifiering.');
+        });
+        } else {
+          requestAnimationFrame(scanQRCode);
+        }
+      }
+  </script>
+</body>
+</html>

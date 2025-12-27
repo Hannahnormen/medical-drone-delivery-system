@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Drone in Lund</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="static/style.css"> <!-- Koppla CSS -->
+</head>
+
+
+<body>
+
+  <div id="problem-form-overlay" class="info-panel hidden">
+    <div class="info-panel-content">
+      <h3>Anmäl problem med leveransen</h3>
+      <textarea id="problem-message" placeholder="Beskriv problemet..." rows="5" style="width: 100%;"></textarea>
+      <div style="margin-top: 1rem;">
+        <button onclick="submitProblem()">Skicka</button>
+        <button onclick="closeProblemForm()" style="margin-left: 1rem; background-color: grey;">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Infopanel för meddelande -->
+  <div id="info-panel" class="info-panel hidden">
+    <div class="info-panel-content">
+      <h3 id="info-panel-title">Information</h3>
+      <p id="info-panel-message">Meddelande</p>
+      <button onclick="goBackToHome()">Till Huvudsidan</button>
+      <button onclick="closeInfoPanel()">Avbryt </button>
+    </div>
+  </div>
+  
+  <!-- Container för orderinformation -->
+  <div class="order-info-container">
+    <h3>Orderinformation</h3>
+    <p><strong>Ordernummer:</strong> <span id="order-number">-</span></p>
+    <p><strong>Leveransadress:</strong> <span id="delivery-address">-</span></p>
+    <p><strong>Beställda produkter:</strong></p>
+    <ul id="ordered-products"></ul>
+    <p><strong>Total vikt:</strong> <span id="total-weight">-></span></p>
+    <p><strong>Orderstatus:</strong> <span id="order-status">-</span></p>
+    
+
+     <!-- Knapp för att gå till huvudsidan -->
+     <button id="back-to-home" onclick="goBackToHome()">Till Huvudsidan</button>
+     <!-- Knapp för att gå till QR-skanner -->
+     <button id="qr-scan-button" onclick="goToQRScanner()">Skanna QR-kod</button>
+  </div>
+
+  <button onclick="openProblemForm()" class="problem-btn-floating"> Anmäl problem</button>
+
+  <p id="order-info"></p>
+
+  <object id="map" data="static/images/lund-map.svg" type="image/svg+xml"></object>
+
+  <script type="text/javascript">
+  let currentOrderNumber = null;
+
+  function pollOrderStatus() {
+    if (!currentOrderNumber) return;
+
+    fetch(`/order_status/${currentOrderNumber}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          updateOrderStatus(data.status);
+        }
+      })
+      .catch(err => console.error("Polling error:", err));
+  }
+
+  function updateOrderStatus(status) {
+    const orderStatusElement = document.getElementById("order-status");
+    orderStatusElement.innerText = status;
+
+    if (status === "levereras") {
+      orderStatusElement.style.color = "orange";
+    } else if (status === "levererad") {
+      orderStatusElement.style.color = "green";
+    } else {
+      orderStatusElement.style.color = "gray";
+    }
+  }
+
+        // Laddar orderdata från URL:en och fyller ut i rutan
+    function loadOrderDataFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+
+      const orderNr = params.get("ordernumber") || "-";
+      const address = params.get("address")?.replace(/\+/g, ' ') || "-";
+      const weight = params.get("weight") || "-";
+      const productListRaw = params.get("products");
+      const orderStatus = params.get("status") || "Okänd";
+      const cityGuess = address.split(' ')[1] || "Lund"; 
+      
+      
+
+      document.getElementById("order-number").innerText = orderNr;
+      document.getElementById("delivery-address").innerText = address;
+      document.getElementById("total-weight").innerText = weight + " mg";
+     
+      // Uppdatera statusen med färg
+      const orderStatusElement = document.getElementById("order-status");
+      updateOrderStatus(orderStatus);
+
+      if (orderStatus === "väderproblem") {
+        document.getElementById("info-panel-title").innerText = "Väderförhållanden olämpliga";
+        document.getElementById("info-panel-message").innerText = 
+          "Drönaren kan inte skickas just nu på grund av dåliga väderförhållanden. Vi meddelar dig när leveransen kan återupptas.";
+        document.getElementById("info-panel").classList.remove("hidden");
+}
+
+      if (productListRaw) {
+        try {
+          // Dekoda base64 URL-safe → vanlig base64
+          const correctedBase64 = productListRaw.replace(/-/g, '+').replace(/_/g, '/');
+          const decodedJson = atob(correctedBase64);
+          const products = JSON.parse(decodedJson);
+
+          const listElement = document.getElementById("ordered-products");
+          listElement.innerHTML = '';
+
+          products.forEach(product => {
+            const li = document.createElement("li");
+            li.innerText = product;
+            listElement.appendChild(li);
+          });
+        } catch (e) {
+          console.error("Kunde inte tolka produktlistan:", e);
+        }
+      }
+
+      setInterval(pollOrderStatus, 5000);  // Starta polling efter laddning
+
+    }
+
+   
+    
+     // Uppdaterar statusen på sidan baserat på färg och text
+    function updateOrderStatus(status) {
+      const orderStatusElement = document.getElementById("order-status");
+
+      if (status === "levereras") {
+        orderStatusElement.style.color = "blue";
+        orderStatusElement.innerText = "levereras";
+      } else if (status === "levererad") {
+        orderStatusElement.style.color = "green";
+        orderStatusElement.innerText = "levererad";
+      }  else if (status === "väderproblem") {
+        orderStatusElement.style.color = "blue";
+        orderStatusElement.innerText = "Olämpligt väder";
+      } else  {
+        orderStatusElement.style.color = "red";
+        orderStatusElement.innerText = "i kö";
+      } 
+    }
+
+    // Funktion för att pollera orderstatus från backend
+    function pollOrderStatus() {
+      const params = new URLSearchParams(window.location.search);
+      const currentOrder = params.get("ordernumber");
+
+      if (!currentOrder) return;
+
+      fetch(`/order_status/${currentOrder}`)
+        .then(response => response.json())
+        .then(data => {
+          updateOrderStatus(data.status);
+        })
+        .catch(console.error)
+        .finally(() => {
+          // Uppdatera varje 2 sekund
+          setTimeout(pollOrderStatus, 2000);
+        });
+    }
+      
+
+
+    // Kör vid sidladdning
+  loadOrderDataFromQuery();
+
+  // Starta polling av orderstatus
+  pollOrderStatus();
+    
+    // Funktion för att visa drönare på kartan
+    function LoadDrone(droneID, x, y, status) {
+      var doc = document.getElementById("map");
+      $(doc).ready(function() {
+        var doc_svg = doc.getSVGDocument();
+        var svg = doc_svg.getElementById("map-svg");
+        var circleNode = svg.getElementById(droneID);
+
+        var color = (status === 'idle') ? 'green' : 'red';
+
+        if(circleNode == null) {
+          circleNode = doc_svg.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circleNode.setAttributeNS(null, 'cx', x);
+          circleNode.setAttributeNS(null, 'cy', y);
+          circleNode.setAttributeNS(null, 'r', '5');
+          circleNode.setAttributeNS(null, 'fill', color);
+          circleNode.setAttributeNS(null, 'id', droneID);
+          svg.appendChild(circleNode);
+        } else {
+          circleNode.setAttributeNS(null, 'cx', x);
+          circleNode.setAttributeNS(null, 'cy', y);
+          circleNode.setAttributeNS(null, 'fill', color);
+        }
+      });
+    }
+    
+    var set_delay = 10;
+    function pollDrones() {
+      $.ajax({
+        url: 'http://localhost:5000/get_drones'
+      })
+      .done(function(server_response) {
+        var avalaible_drones = Object.keys(server_response);
+        for (const droneID of avalaible_drones){
+          var x = server_response[droneID].longitude;
+          var y = server_response[droneID].latitude;
+          var status = server_response[droneID].status;
+          LoadDrone(droneID, x, y, status);
+        }
+      })
+      .always(function() {
+        setTimeout(pollDrones, set_delay);
+      });
+    }
+    // Funktion som navigerar användaren tillbaka till huvudsidan
+    function goBackToHome() {
+      window.location.href = "/";  // Byt till din huvudsida (kan vara en annan URL)
+    }
+
+    function goToQRScanner() {
+      const orderStatus = document.getElementById("order-status").innerText.toLowerCase();
+      if (orderStatus === "levererad") {
+        const orderId = document.getElementById("order-number").innerText;
+        window.location.href = `/qr?order_id=${orderId}`;
+      } else {
+        showInfoPanel();  // Visa panel istället för alert
+      }
+    }
+
+    function showInfoPanel() {
+      document.getElementById("info-panel-title").innerText = "QR-kod inte tillgänglig";
+      document.getElementById("info-panel-message").innerText = 
+      "Du kan endast skanna QR-koden när din beställning är levererad.";
+      document.getElementById("info-panel").classList.remove("hidden");
+}
+    
+
+    function closeInfoPanel() {
+      document.getElementById("info-panel").classList.add("hidden");
+    }
+
+    function openProblemForm() {
+  document.getElementById("problem-form-overlay").classList.remove("hidden");
+}
+
+function closeProblemForm() {
+  document.getElementById("problem-form-overlay").classList.add("hidden");
+}
+
+function submitProblem() {
+  const message = document.getElementById("problem-message").value.trim();
+  const orderNumber = document.getElementById("order-number").innerText;
+
+  if (!message) {
+    alert("Fyll i ett meddelande först.");
+    return;
+  }
+
+  fetch('/report-problem', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({order_number: orderNumber, message: message,})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Tack! Ditt meddelande har skickats.");
+      document.getElementById("problem-message").value = '';
+      closeProblemForm();
+    } else {
+      alert("Fel vid rapportering: " + (data.error || "okänt fel"));
+    }
+  })
+  .catch(error => {
+    console.error("Fel vid anmälan:", error);
+    alert("Kunde inte skicka problemet.");
+  });
+}
+
+    
+    pollDrones();
+
+  </script>
+</body>
+</html>

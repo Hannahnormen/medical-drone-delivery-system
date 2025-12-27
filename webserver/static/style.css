@@ -1,0 +1,225 @@
+/* Grundläggande stil för sidan */
+body {
+    background-color: #021323; /* Ljusgråblå bakgrund */
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #2c3e50; /* Mörkgrå textfärg för tydlighet */
+  }
+
+  .info-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .info-panel-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .info-panel-content h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .info-panel-content button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .info-panel-content button:hover {
+    background: #0056b3;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  /* Container för orderinfo */
+  .order-info-container {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    width: 320px;
+    background-color: #ffffff; /* Vit bakgrund för klarhet */
+    padding: 24px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  /* Rubrik i informationsrutan */
+  .order-info-container h3 {
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a2e44;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e0e6ed;
+    padding-bottom: 6px;
+  }
+  
+  
+  /* Paragrafer i rutan */
+  .order-info-container p {
+    margin: 6px 0;
+    color: #34495e;
+  }
+  
+
+/* Formulär i infopanel */
+#problem-form-overlay textarea {
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  background: #fafafa;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Knappstilar i popup */
+#problem-form-overlay button {
+  font-size: 14px;
+  padding: 8px 16px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#problem-form-overlay button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+#problem-form-overlay button:first-child:hover {
+  background-color: #0056b3;
+}
+
+#problem-form-overlay button:last-child {
+  background-color: #bdc3c7;
+  color: #2c3e50;
+}
+
+#problem-form-overlay button:last-child:hover {
+  background-color: #95a5a6;
+}
+
+/* Flytande röd problemknapp utanför orderpanelen */
+.problem-btn-floating {
+  position: fixed;
+  top: calc(30px + 470px + 10px); /* Justera efter hur hög din panel är */
+  left: 60px;
+  width: 300px;
+  padding: 10px;
+  background-color: #a22112;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 1100;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.problem-btn-floating:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+  
+  /* Lista med produkter */
+  #ordered-products {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 10px 0;
+  }
+  
+  #ordered-products li {
+    padding-left: 8px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Vikttext */
+  #total-weight {
+    color: #2c3e50;
+  }
+
+  #order-status {
+    font-weight: bold;
+    color: #e67e22; /* Orange färg för tydlighet */
+}
+  
+  /* Knapp: Till huvudsidan */
+  #back-to-home {
+    width: 100%;
+    padding: 10px;
+    background-color: #2c3e50; /* Mörkgråblå */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  #back-to-home:hover {
+    background-color: #1a242f;
+  }
+
+  #qr-scan-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  #qr-scan-button:hover {
+    background-color: #1a242f;
+  }
+
+  
+
+  

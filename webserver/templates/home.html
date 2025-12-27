@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedDrop – Apoteket Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="static/homestyle.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Välkommen till MedDrop</h1>
+            <p>Beställ mediciner och få dem levererade med drönare.</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="track-order">
+            <div class="container">
+                <h2>Skicka din order</h2>
+                <h3>För att skicka din order, skriv in ditt ordernummer:</h3>
+                <label for="order-number">Ange ditt ordernummer:</label>
+                <input type="text" id="order-number" name="order-number" placeholder="Ordernummer...">
+                <button onclick="trackOrder()" class="track-button">Skicka order</button>
+                <p id="error-message" style="color: red; display: none;">Ordernummer finns inte.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 MedDrop. Alla rättigheter reserverade.</p>
+        </div>
+    </footer>
+
+    <script>
+        function trackOrder() {
+            var orderNumber = document.getElementById("order-number").value;
+    if (orderNumber) {
+        fetch('/verify_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'order-number=' + encodeURIComponent(orderNumber),
+            redirect: 'follow' // detta är default, men vi nämner det för tydlighet
+        })
+        .then(response => {
+            if (response.redirected) {
+                // Om servern returnerar en redirect (HTTP 302)
+                window.location.href = response.url;
+            } else if (response.ok) {
+                // Backup om du själv vill bygga URL:en (inte nödvändigt i ditt fall)
+                window.location.href = "/map?ordernumber=" + encodeURIComponent(orderNumber);
+            } else {
+                document.getElementById("error-message").style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("error-message").style.display = 'block';
+        });
+    } else {
+        alert("Vänligen ange ett ordernummer.");
+    }
+}
+            
+    </script>
+</body>
+</html>
