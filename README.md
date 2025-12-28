@@ -2,8 +2,46 @@
 Course Project - Digitalization, System Design and User-Centered Development
 
 # Overview
-This project is based on a course-provided codebase used in earlier laboratory assignments. The initial framework included basic drone simulation, map visualization, and server communication.
-Install the required Python packages if not done already (you probably did this in the previous assignments):
+This project is a prototype of a medical drone delivery system. It is based on a course-provided codebase and the core structure included a basic drone simulation, map based interface and backend communication. On top of the initial structure, the project was collaboratively extended to explore system design and digital services.
+
+---
+
+#Implemented Features
+- **Support for multiple drones:**
+  Support for running and managing multiple drones simultaneously, with unique IDs and       dedicated ports.
+
+- **Web UI:**
+  An interactive user interface displaying the drones on a map, where users can see drone    positions and order status.
+
+- **Route planning service:**
+  A route planner that calculates and assigns delivery routes based on drones states,        positions and destinations.
+  
+- **Redis-based data handling:**
+  Usage of redis to store drone states and delivery data, enabling real-time updates.
+  
+- **Weather sensitive delivery logic:**
+  Deliverys are paused during unsafe weather conditions.
+
+  ---
+
+#Technology and Tools
+- **Backend: ** Python, Flask, Redis
+- **Frontend:** HTML, CSS, Java
+- **Other tools:** Raspberry Pi, REST APIs, QR-code generation
+
+---
+
+#Team Collaboration
+This project was developed in a team as a part of a course assignment. The initial structure was provided by the course and was expanded through teamwork.
+Team members: Hannah Normén, Signe Davidsson, Elliot Sjövall and Mohamad Alexander Hiadan
+
+___
+
+#How to run the simulation
+You can run the project in a simulated enviroment, using several Raspberry pies
+
+#Requirments
+Install the required Python packages:
 ```
 sudo apt update
 sudo apt install python3-socketio
@@ -15,7 +53,7 @@ sudo apt install python3-geopy
 
 
 ## On the Server Pi:
-Go to `/webserver`, start your Redis server (if it is not already running, which it probably is – test using `redis-cli`) and run the three flask servers that make up the server side of the drone application:
+Go to `/webserver`, start your Redis server and run the three flask servers that make up the server side of the drone application:
 
 1. Run the server for writing data to the redis server
     ```
@@ -47,7 +85,7 @@ Open up 4 terminals and go to `/pi`, run the following commands for each termina
     python3 -m flask run --port=5000 --host=0.0.0.0    
     ```
 
-5.  Open a web browser (e.g. Chromium) on your Raspberry Pi and enter the following URL. You should see a map of Lund as in the previous assignment. Make sure you see two red dots on top of each other representing the drone at the LTH location.
+5.  Open a web browser on your Raspberry Pi and enter the following URL.
 
     ```
     http://localhost:5000
