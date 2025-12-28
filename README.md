@@ -6,7 +6,7 @@ This project is a prototype of a medical drone delivery system. It is based on a
 
 ---
 
-#Implemented Features
+# Implemented Features
 - **Support for multiple drones:**
   Support for running and managing multiple drones simultaneously, with unique IDs and       dedicated ports.
 
@@ -24,23 +24,23 @@ This project is a prototype of a medical drone delivery system. It is based on a
 
   ---
 
-#Technology and Tools
+# Technology and Tools
 - **Backend: ** Python, Flask, Redis
 - **Frontend:** HTML, CSS, Java
 - **Other tools:** Raspberry Pi, REST APIs, QR-code generation
 
 ---
 
-#Team Collaboration
+# Team Collaboration
 This project was developed in a team as a part of a course assignment. The initial structure was provided by the course and was expanded through teamwork.
 Team members: Hannah Normén, Signe Davidsson, Elliot Sjövall and Mohamad Alexander Hiadan
 
 ___
 
-#How to run the simulation
+# How to run the simulation
 You can run the project in a simulated enviroment, using several Raspberry pies
 
-#Requirments
+# Requirments
 Install the required Python packages:
 ```
 sudo apt update
